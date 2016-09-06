@@ -1,5 +1,5 @@
 # moveSomeAnswers
-When using randomize order in answers, you sometimes need to hget some specific answers at last, this plugin offer a solution.
+When using randomize order in answers, you sometimes need to get some specific answers at last, this plugin offer a solution.
 
 ## Documentation
 Before activate this plugin you need to get and activate toolsSmartDomDocument plugin.
