@@ -5,7 +5,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016 Denis Chenu <http://www.sondages.pro>
  * @license GPL
- * @version 0.1.1
+ * @version 0.2.0
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,13 @@ class moveSomeAnswers extends PluginBase
 
     static protected $name = 'moveSomeAnswers';
     static protected $description = 'Allow to move some answers directly at end if random is set';
+
+  private $translation=array(
+    'Answers code to move at end (with random order)'=>array('fr'=>"Codes des réponses à déplacer en fin de liste si l'ordre est aléatoire."),
+    'If you not set here: <code>%s</code> used by default'=>array('fr'=>"Si vide: <code>%s</code> sera utilisé"),
+    'Move this code at end'=>array('fr'=>"Déplacer ces codes en fin de liste"),
+    'Multiple code can be separated by , (comma). Used only if random is set. By default use survey settings. Using dot (.) deactivate default.'=>array('fr'=>"Utiliser la virgule (,) pour séparer les codes. Utilisé uniquement pour le mode aléatoire. Utilise les codes du questionnaire par défaut, utiliser le . (point) désactive ce sytème"),
+  );
 
   /**
    * The settings for this plugin
@@ -63,12 +70,21 @@ class moveSomeAnswers extends PluginBase
                     'htmlOptions'=>array(
                       'class'=>'form-control'
                     ),
-                    'label'=>'This code is moved at end if question have random order ',
-                    'help'=>'If you not set here, use : <code>'.$moveSomeAnswersDefault.'</code>',
+                    'label'=>$this->gT('Answers code to move at end (with random order)'),
+                    'help'=>sprintf($this->gT('If you not set here: <code>%s</code> used by default'),$moveSomeAnswersDefault),
                     'current'=>$this->get('moveSomeAnswers','Survey',$oEvent->get('survey'),"")
                 ),
             )
         ));
+    }
+    public function newSurveySettings()
+    {
+        $event = $this->event;
+        foreach ($event->get('settings') as $name => $value)
+        {
+            $default=null;
+            $this->set($name, $value, 'Survey', $event->get('survey'),$default);
+        }
     }
     /**
      * Activate or not
@@ -101,8 +117,8 @@ class moveSomeAnswers extends PluginBase
                 'sortorder'=>101,
                 'inputtype'=>'text',
                 'default'=>'',
-                "help"=>'List of code separated by , or ;. If result is empty or random is not set: no change was done. Adding dot (.) deactivate default.',
-                "caption"=>'Move this code at end (separate by ,)'
+                "caption"=>$this->gT('Move this code at end'),
+                "help"=>$this->gT('Multiple code can be separated by , (comma). Used only if random is set. By default use survey settings. Using dot (.) deactivate default.'),
             ),
         );
         $event->append('questionAttributes', $questionAttributes);
@@ -183,4 +199,14 @@ class moveSomeAnswers extends PluginBase
             }
         }
     }
+
+    private function gT($string)
+    {
+      if(isset($this->translation[$string][Yii::app()->language]))
+      {
+        return $this->translation[$string][Yii::app()->language];
+      }
+      return $string;
+    }
+
 }
