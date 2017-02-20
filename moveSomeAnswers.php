@@ -17,7 +17,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-class moveSomeAnswers extends PluginBase
+class moveSomeAnswers extends \ls\pluginmanager\PluginBase
 {
 
     protected $storage = 'DbStorage';
