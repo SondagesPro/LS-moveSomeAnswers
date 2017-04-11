@@ -3,9 +3,9 @@
  * Add an attribute for some question, to always move some answer or sub question at end
  *
  * @author Denis Chenu <denis@sondages.pro>
- * @copyright 2016 Denis Chenu <http://www.sondages.pro>
+ * @copyright 2016-2017 Denis Chenu <http://www.sondages.pro>
  * @license GPL
- * @version 0.1.1
+ * @version 0.1.2
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -176,6 +176,19 @@ class moveSomeAnswers extends \ls\pluginmanager\PluginBase
                     }
                     if($bUpdated)
                     {
+                        /* For multiple numeric : must move some part at end */
+                        if($oEvent->get('type')=="K" && $parentList) {
+                            $childToMove=array();
+                            foreach($parentList->getElementsByTagName('tr') as $child) {
+                                if(!$child->hasAttribute('id')){
+                                    $childToMove[]=$child;
+                                }
+                            }
+                            foreach($childToMove as $child) {
+                                $parentList->removeChild($child);
+                                $parentList->appendChild($child);
+                            }
+                        }
                         $newHtml = $dom->saveHTMLExact();
                         $oEvent->set('answers',$newHtml);
                     }
