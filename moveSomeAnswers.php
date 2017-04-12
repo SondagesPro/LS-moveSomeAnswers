@@ -50,6 +50,17 @@ class moveSomeAnswers extends \ls\pluginmanager\PluginBase
 
     }
 
+    public function newSurveySettings()
+    {
+        $event = $this->event;
+        foreach ($event->get('settings') as $name => $value)
+        {
+            /* In order use survey setting, if not set, use global, if not set use default */
+            $default=$event->get($name,null,null,isset($this->settings[$name]['default'])?$this->settings[$name]['default']:NULL);
+            $this->set($name, $value, 'Survey', $event->get('survey'),$default);
+        }
+    }
+
     public function beforeSurveySettings()
     {
         $oEvent = $this->event;
