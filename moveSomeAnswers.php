@@ -115,8 +115,8 @@ class moveSomeAnswers extends \ls\pluginmanager\PluginBase
                 'sortorder'=>101,
                 'inputtype'=>'text',
                 'default'=>'',
-                "help"=>this->_translate('List of code separated by , or ;. If result is empty or random is not set: no change was done. Adding dot (.) deactivate default.'),
-                "caption"=>this->_translate('Move this code at end (separate by ,)')
+                "help"=>$this->_translate('List of code separated by , or ;. If result is empty or random is not set: no change was done. Adding dot (.) deactivate default.'),
+                "caption"=>$this->_translate('Move this code at end (separate by ,)')
             ),
         );
         $event->append('questionAttributes', $questionAttributes);
