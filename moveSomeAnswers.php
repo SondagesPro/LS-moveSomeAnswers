@@ -5,7 +5,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2017 Denis Chenu <http://www.sondages.pro>
  * @license GPL
- * @version 0.1.3
+ * @version 0.2.0
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +48,9 @@ class moveSomeAnswers extends \ls\pluginmanager\PluginBase
         $this->subscribe('beforeSurveySettings');
         $this->subscribe('newSurveySettings');
 
+        /* To add own translation message source */
+        $this->subscribe('afterPluginLoad');
+
     }
 
     public function newSurveySettings()
@@ -74,8 +77,8 @@ class moveSomeAnswers extends \ls\pluginmanager\PluginBase
                     'htmlOptions'=>array(
                       'class'=>'form-control'
                     ),
-                    'label'=>'This code is moved at end if question have random order ',
-                    'help'=>'If you not set here, use : <code>'.$moveSomeAnswersDefault.'</code>',
+                    'label'=>$this->_translate('This code is moved at end if question have random order'),
+                    'help'=>sprintf($this->_translate('If you not set here, use : <code>%s</code>'),$moveSomeAnswersDefault),
                     'current'=>$this->get('moveSomeAnswers','Survey',$oEvent->get('survey'),"")
                 ),
             )
@@ -112,8 +115,8 @@ class moveSomeAnswers extends \ls\pluginmanager\PluginBase
                 'sortorder'=>101,
                 'inputtype'=>'text',
                 'default'=>'',
-                "help"=>'List of code separated by , or ;. If result is empty or random is not set: no change was done. Adding dot (.) deactivate default.',
-                "caption"=>'Move this code at end (separate by ,)'
+                "help"=>this->_translate('List of code separated by , or ;. If result is empty or random is not set: no change was done. Adding dot (.) deactivate default.'),
+                "caption"=>this->_translate('Move this code at end (separate by ,)')
             ),
         );
         $event->append('questionAttributes', $questionAttributes);
@@ -206,5 +209,26 @@ class moveSomeAnswers extends \ls\pluginmanager\PluginBase
                 }
             }
         }
+    }
+
+    private function _translate($string){
+        return Yii::t('',$string,array(),get_class($this));
+    }
+    /**
+     * Add this translation just after loaded all plugins
+     * @see event afterPluginLoad
+     */
+    public function afterPluginLoad(){
+        // messageSource for this plugin:
+        $messageMaintenanceMode=array(
+            'class' => 'CGettextMessageSource',
+            'cacheID' => get_class($this).'Lang',
+            'cachingDuration'=>3600,
+            'forceTranslation' => true,
+            'useMoFile' => true,
+            'basePath' => __DIR__ . DIRECTORY_SEPARATOR.'locale',
+            'catalog'=>'messages',// default from Yii
+        );
+        Yii::app()->setComponent(get_class($this),$messageMaintenanceMode);
     }
 }

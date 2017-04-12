@@ -1,0 +1,39 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: moveSomeAnswers\n"
+"POT-Creation-Date: 2017-04-12 16:18+0200\n"
+"PO-Revision-Date: 2017-04-12 16:19+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.12\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Poedit-KeywordsList: _translate\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: moveSomeAnswers.php:80
+msgid "This code is moved at end if question have random order"
+msgstr ""
+"Codes des réponses à déplacer en fin de liste si l'ordre est aléatoire."
+
+#: moveSomeAnswers.php:81
+#, php-format
+msgid "If you not set here, use : <code>%s</code>"
+msgstr "Si vide: <code>%s</code> sera utilisé"
+
+#: moveSomeAnswers.php:118
+msgid ""
+"List of code separated by , or ;. If result is empty or random is not set: "
+"no change was done. Adding dot (.) deactivate default."
+msgstr ""
+"Utiliser la virgule (,) pour séparer les codes. Utilisé uniquement pour le "
+"mode aléatoire. Utilise les codes du questionnaire par défaut, utiliser le . "
+"(point) désactive ce sytème"
+
+#: moveSomeAnswers.php:119
+msgid "Move this code at end (separate by ,)"
+msgstr "Déplacer ces codes en fin de liste (séparé par ,)"
