@@ -5,7 +5,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2017 Denis Chenu <http://www.sondages.pro>
  * @license GPL
- * @version 0.2.0
+ * @version 0.2.1
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -115,8 +115,8 @@ class moveSomeAnswers extends \ls\pluginmanager\PluginBase
                 'sortorder'=>101,
                 'inputtype'=>'text',
                 'default'=>'',
-                "help"=>this->_translate('List of code separated by , or ;. If result is empty or random is not set: no change was done. Adding dot (.) deactivate default.'),
-                "caption"=>this->_translate('Move this code at end (separate by ,)')
+                "help"=>$this->_translate('List of code separated by , or ;. If result is empty or random is not set: no change was done. Adding dot (.) deactivate default.'),
+                "caption"=>$this->_translate('Move this code at end (separate by ,)')
             ),
         );
         $event->append('questionAttributes', $questionAttributes);

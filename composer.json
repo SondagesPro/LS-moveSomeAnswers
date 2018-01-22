@@ -1,0 +1,15 @@
+{
+    "name": "SondagesPro/moveSomeAnswers",
+    "description": "When using randomize order in answers, you can want to get some specific answers at last position, this plugin offer a solution.",
+    "type": "limesurvey-plugin",
+    "homepage": "https://github.com/SondagesPro/LS-moveSomeAnswers",
+    "license": "AGPL-3.0+",
+    "authors": [
+        {
+            "name": "Denis Chenu",
+            "email": "contact@sondages.pro"
+        }
+    ],
+    "minimum-stability": "beta",
+    "require": {}
+}
