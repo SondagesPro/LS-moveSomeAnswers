@@ -11,6 +11,8 @@ You have 3 settings:
 - Default by survey : each survey can have own default: set it to dot (.) to deactivate by survey ; to use global default use an empty string
 - New question attribute : if question have random_order attribute, the new attribute is tested (get default from survey if is empty or not set). The list of answer code is put at end if exist. The answer code can be separate by comma (,).
 
+This plugin was not tested in LimeSurvey 3.0 and up version. 
+
 ## Copyright
 - Copyright © 2016 Denis Chenu <http://sondages.pro>
 - Licence : GNU General Public License <https://www.gnu.org/licenses/gpl-3.0.html>
