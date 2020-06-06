@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Add an attribute for some question, to always move some answer or sub question at end
  *
@@ -17,32 +18,31 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+
 class moveSomeAnswers extends PluginBase
 {
-
     protected $storage = 'DbStorage';
 
-    static protected $name = 'moveSomeAnswers';
-    static protected $description = 'Allow to move some answers directly at end if random is set';
+    protected static $name = 'moveSomeAnswers';
+    protected static $description = 'Allow to move some answers directly at end if random is set';
 
-  /**
-   * The settings for this plugin
-   */
-    protected $settings=array(
-        "moveSomeAnswers"=>array(
-            "type"=>'string',
-            'label'=>'This code is moved at end if question have random order (Single choice radio and multiple choice)',
-            'default'=>'DNK',
+    /**
+     * The settings for this plugin
+     */
+    protected $settings = array(
+        "moveSomeAnswers" => array(
+            "type " => 'string',
+            'label' => 'This code is moved at end if question have random order (Single choice radio and multiple choice)',
+            'default' => 'DNK',
         ),
     );
 
-
-
+    /** @inheritdoc */
     public function init()
     {
         $this->subscribe('beforeActivate');
 
-        $this->subscribe('beforeQuestionRender','moveSomeAnswersInList');
+        $this->subscribe('beforeQuestionRender', 'moveSomeAnswersInList');
         $this->subscribe('newQuestionAttributes');
 
         $this->subscribe('beforeSurveySettings');
@@ -50,36 +50,34 @@ class moveSomeAnswers extends PluginBase
 
         /* To add own translation message source */
         $this->subscribe('afterPluginLoad');
-
     }
 
     public function newSurveySettings()
     {
         $event = $this->event;
-        foreach ($event->get('settings') as $name => $value)
-        {
+        foreach ($event->get('settings') as $name => $value) {
             /* In order use survey setting, if not set, use global, if not set use default */
-            $default=$event->get($name,null,null,isset($this->settings[$name]['default'])?$this->settings[$name]['default']:NULL);
-            $this->set($name, $value, 'Survey', $event->get('survey'),$default);
+            $default = $event->get($name, null, null, isset($this->settings[$name]['default']) ? $this->settings[$name]['default'] : null);
+            $this->set($name, $value, 'Survey', $event->get('survey'), $default);
         }
     }
 
     public function beforeSurveySettings()
     {
         $oEvent = $this->event;
-        $newSettings=array();
-        $moveSomeAnswersDefault=$this->get('moveSomeAnswers',null,null,$this->settings['moveSomeAnswers']['default']);
+        $newSettings = array();
+        $moveSomeAnswersDefault = $this->get('moveSomeAnswers', null, null, $this->settings['moveSomeAnswers']['default']);
         $oEvent->set("surveysettings.{$this->id}", array(
             'name' => get_class($this),
             'settings' => array(
-                'moveSomeAnswers'=>array(
-                    "type"=>'string',
-                    'htmlOptions'=>array(
-                      'class'=>'form-control'
+                'moveSomeAnswers' => array(
+                    "type" => 'string',
+                    'htmlOptions' => array(
+                        'class' => 'form-control'
                     ),
-                    'label'=>$this->_translate('This code is moved at end if question have random order'),
-                    'help'=>sprintf($this->_translate('If you not set here, use : <code>%s</code>'),$moveSomeAnswersDefault),
-                    'current'=>$this->get('moveSomeAnswers','Survey',$oEvent->get('survey'),"")
+                    'label' => $this->translate('This code is moved at end if question have random order'),
+                    'help' => sprintf($this->translate('If you not set here, use : <code>%s</code>'), $moveSomeAnswersDefault),
+                    'current' => $this->get('moveSomeAnswers', 'Survey', $oEvent->get('survey'), "")
                 ),
             )
         ));
@@ -89,14 +87,11 @@ class moveSomeAnswers extends PluginBase
      */
     public function beforeActivate()
     {
-        $oToolsSmartDomDocument = Plugin::model()->find("name=:name",array(":name"=>'toolsDomDocument'));
-        if(!$oToolsSmartDomDocument)
-        {
+        $oToolsSmartDomDocument = Plugin::model()->find("name=:name", array(":name" => 'toolsDomDocument'));
+        if (!$oToolsSmartDomDocument) {
             $this->getEvent()->set('message', gT("You must download toolsSmartDomDocument plugin"));
             $this->getEvent()->set('success', false);
-        }
-        elseif(!$oToolsSmartDomDocument->active)
-        {
+        } elseif (!$oToolsSmartDomDocument->active) {
             $this->getEvent()->set('message', gT("You must activate toolsSmartDomDocument plugin"));
             $this->getEvent()->set('success', false);
         }
@@ -109,14 +104,14 @@ class moveSomeAnswers extends PluginBase
     {
         $event = $this->getEvent();
         $questionAttributes = array(
-            'moveSomeAnswers'=>array(
-                "types"=>"LMPQK",
-                'category'=>gT('Display'),
-                'sortorder'=>101,
-                'inputtype'=>'text',
-                'default'=>'',
-                "help"=>$this->_translate('List of code separated by , or ;. If result is empty or random is not set: no change was done. Adding dot (.) deactivate default.'),
-                "caption"=>$this->_translate('Move this code at end (separate by ,)')
+            'moveSomeAnswers' => array(
+                "types" => "LMPQK",
+                'category' => gT('Display'),
+                'sortorder' => 101,
+                'inputtype' => 'text',
+                'default' => '',
+                "help" => $this->translate('List of code separated by , or ;. If result is empty or random is not set: no change was done. Adding dot (.) deactivate default.'),
+                "caption" => $this->translate('Move this code at end (separate by ,)')
             ),
         );
         $event->append('questionAttributes', $questionAttributes);
@@ -127,114 +122,105 @@ class moveSomeAnswers extends PluginBase
      */
     public function moveSomeAnswersInList()
     {
-        $oEvent=$this->getEvent();
-        if(in_array($oEvent->get('type'),array("L","M","P","Q","K")))
-        {
-            $surveySettings=$this->get('moveSomeAnswers','Survey',$oEvent->get('surveyId'));
-            if($surveySettings=="")
-            {
-                $surveySettings=$this->get('moveSomeAnswers',null,null,$this->settings['moveSomeAnswers']['default']);
+        $oEvent = $this->getEvent();
+        if (in_array($oEvent->get('type'), array("L","M","P","Q","K"))) {
+            $surveySettings = $this->get('moveSomeAnswers', 'Survey', $oEvent->get('surveyId'));
+            if ($surveySettings == "") {
+                $surveySettings = $this->get('moveSomeAnswers', null, null, $this->settings['moveSomeAnswers']['default']);
             }
             $aAttributes = QuestionAttribute::model()->getQuestionAttributes($this->getEvent()->get('qid'));
-            if($aAttributes["random_order"] || $surveySettings )
-            {
+            if ($aAttributes["random_order"] || $surveySettings) {
                 /* @todo : must use EM for $aAttributes["orderByAnswers"] */
-                $moveSomeAnswers=trim($aAttributes["moveSomeAnswers"]);
-                if(empty($moveSomeAnswers)) {
+                $moveSomeAnswers = trim($aAttributes["moveSomeAnswers"]);
+                if (empty($moveSomeAnswers)) {
                     $moveSomeAnswers = $surveySettings;
                 }
-                if($moveSomeAnswers=="")
-                {
-                    $moveSomeAnswers=$this->get('moveSomeAnswers','Survey',$oEvent->get('surveyId'));
-                    if($moveSomeAnswers=="")
-                    {
-                        $moveSomeAnswers=$this->get('moveSomeAnswers',null,null,);
+                if ($moveSomeAnswers == "") {
+                    $moveSomeAnswers = $this->get('moveSomeAnswers', 'Survey', $oEvent->get('surveyId'));
+                    if ($moveSomeAnswers == "") {
+                        $moveSomeAnswers = $this->get('moveSomeAnswers', null, null, $this->settings['moveSomeAnswers']['default']);
                     }
                 }
-                if($moveSomeAnswers!=="" && $moveSomeAnswers!==".")
-                {
-                    $aAtEnd=explode(",",$moveSomeAnswers);
+                if ($moveSomeAnswers !== "" && $moveSomeAnswers !== ".") {
+                    $aAtEnd = explode(",", $moveSomeAnswers);
                     $dom = new \toolsDomDocument\SmartDOMDocument();
                     $dom->loadPartialHTML($this->event->get('answers'));
-                    $bUpdated=false;
-                    switch ($oEvent->get('type'))
-                    {
+                    $bUpdated = false;
+                    switch ($oEvent->get('type')) {
                         case "L":
                         case "Q":
-                        case "K":// 2.51.1 : in an array ....
-                            $lineBaseId="javatbd{$oEvent->get('surveyId')}X{$oEvent->get('gid')}X{$oEvent->get('qid')}";
-                            foreach($aAtEnd as $sAtEnd)
-                            {
+                        case "K":
+                            $lineBaseId = "javatbd{$oEvent->get('surveyId')}X{$oEvent->get('gid')}X{$oEvent->get('qid')}";
+                            foreach ($aAtEnd as $sAtEnd) {
                                 // @todo : Control LS version
-                                $line=$dom->getElementById($lineBaseId.$sAtEnd);
-                                if($line)
-                                {
-                                    $parentList=$line->parentNode;
+                                $line = $dom->getElementById($lineBaseId . $sAtEnd);
+                                if ($line) {
+                                    $parentList = $line->parentNode;
                                     $parentList->removeChild($line);
                                     $parentList->appendChild($line);
-                                    $bUpdated=true;
+                                    $bUpdated = true;
                                 }
                             }
                             /* Optionaly move no answer to end : wait for clearing HTML code */
                             break;
                         case "M":
                         case "P":
-                            $lineBaseId="javatbd{$oEvent->get('surveyId')}X{$oEvent->get('gid')}X{$oEvent->get('qid')}";
-                            foreach($aAtEnd as $sAtEnd)
-                            {
-                                $line=$dom->getElementById($lineBaseId.$sAtEnd);
-                                if($line)
-                                {
-                                    $parentList=$line->parentNode;
+                            $lineBaseId = "javatbd{$oEvent->get('surveyId')}X{$oEvent->get('gid')}X{$oEvent->get('qid')}";
+                            foreach ($aAtEnd as $sAtEnd) {
+                                $line = $dom->getElementById($lineBaseId . $sAtEnd);
+                                if ($line) {
+                                    $parentList = $line->parentNode;
                                     $parentList->removeChild($line);
                                     $parentList->appendChild($line);
-                                    $bUpdated=true;
+                                    $bUpdated = true;
                                 }
                             }
+                            // no break
                         default:
                             break;
                     }
-                    if($bUpdated)
-                    {
+                    if ($bUpdated) {
                         /* For multiple numeric : must move some part at end */
-                        if($oEvent->get('type')=="K" && $parentList) {
-                            $childToMove=array();
-                            foreach($parentList->getElementsByTagName('tr') as $child) {
-                                if(!$child->hasAttribute('id')){
-                                    $childToMove[]=$child;
+                        if ($oEvent->get('type') == "K" && $parentList) {
+                            $childToMove = array();
+                            foreach ($parentList->getElementsByTagName('tr') as $child) {
+                                if (!$child->hasAttribute('id')) {
+                                    $childToMove[] = $child;
                                 }
                             }
-                            foreach($childToMove as $child) {
+                            foreach ($childToMove as $child) {
                                 $parentList->removeChild($child);
                                 $parentList->appendChild($child);
                             }
                         }
                         $newHtml = $dom->saveHTMLExact();
-                        $oEvent->set('answers',$newHtml);
+                        $oEvent->set('answers', $newHtml);
                     }
                 }
             }
         }
     }
 
-    private function _translate($string){
-        return Yii::t('',$string,array(),get_class($this));
+    private function translate($string)
+    {
+        return Yii::t('', $string, array(), get_class($this));
     }
     /**
      * Add this translation just after loaded all plugins
      * @see event afterPluginLoad
      */
-    public function afterPluginLoad(){
+    public function afterPluginLoad()
+    {
         // messageSource for this plugin:
-        $messageMaintenanceMode=array(
+        $messageMaintenanceMode = array(
             'class' => 'CGettextMessageSource',
-            'cacheID' => get_class($this).'Lang',
-            'cachingDuration'=>3600,
+            'cacheID' => get_class($this) . 'Lang',
+            'cachingDuration' => 3600,
             'forceTranslation' => true,
             'useMoFile' => true,
-            'basePath' => __DIR__ . DIRECTORY_SEPARATOR.'locale',
-            'catalog'=>'messages',// default from Yii
+            'basePath' => __DIR__ . DIRECTORY_SEPARATOR . 'locale',
+            'catalog' => 'messages',// default from Yii
         );
-        Yii::app()->setComponent(get_class($this),$messageMaintenanceMode);
+        Yii::app()->setComponent(get_class($this), $messageMaintenanceMode);
     }
 }
