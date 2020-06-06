@@ -3,9 +3,9 @@
  * Add an attribute for some question, to always move some answer or sub question at end
  *
  * @author Denis Chenu <denis@sondages.pro>
- * @copyright 2016-2017 Denis Chenu <http://www.sondages.pro>
+ * @copyright 2016-2020 Denis Chenu <http://www.sondages.pro>
  * @license GPL
- * @version 0.2.1
+ * @version 1.0.0
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-class moveSomeAnswers extends \ls\pluginmanager\PluginBase
+class moveSomeAnswers extends PluginBase
 {
 
     protected $storage = 'DbStorage';
@@ -130,17 +130,25 @@ class moveSomeAnswers extends \ls\pluginmanager\PluginBase
         $oEvent=$this->getEvent();
         if(in_array($oEvent->get('type'),array("L","M","P","Q","K")))
         {
-            $aAttributes=QuestionAttribute::model()->getQuestionAttributes($this->getEvent()->get('qid'));
-            if($aAttributes["random_order"])
+            $surveySettings=$this->get('moveSomeAnswers','Survey',$oEvent->get('surveyId'));
+            if($surveySettings=="")
+            {
+                $surveySettings=$this->get('moveSomeAnswers',null,null,$this->settings['moveSomeAnswers']['default']);
+            }
+            $aAttributes = QuestionAttribute::model()->getQuestionAttributes($this->getEvent()->get('qid'));
+            if($aAttributes["random_order"] || $surveySettings )
             {
                 /* @todo : must use EM for $aAttributes["orderByAnswers"] */
                 $moveSomeAnswers=trim($aAttributes["moveSomeAnswers"]);
+                if(empty($moveSomeAnswers)) {
+                    $moveSomeAnswers = $surveySettings;
+                }
                 if($moveSomeAnswers=="")
                 {
                     $moveSomeAnswers=$this->get('moveSomeAnswers','Survey',$oEvent->get('surveyId'));
                     if($moveSomeAnswers=="")
                     {
-                        $moveSomeAnswers=$this->get('moveSomeAnswers',null,null,$this->settings['moveSomeAnswers']['default']);
+                        $moveSomeAnswers=$this->get('moveSomeAnswers',null,null,);
                     }
                 }
                 if($moveSomeAnswers!=="" && $moveSomeAnswers!==".")
@@ -177,11 +185,9 @@ class moveSomeAnswers extends \ls\pluginmanager\PluginBase
                                 $line=$dom->getElementById($lineBaseId.$sAtEnd);
                                 if($line)
                                 {
-                                    // @todo : Control LS version
-                                    $element=$line->parentNode;// Arg ..... LS 2.50.1, and after ?
-                                    $parentList=$element->parentNode;
-                                    $parentList->removeChild($element);
-                                    $parentList->appendChild($element);
+                                    $parentList=$line->parentNode;
+                                    $parentList->removeChild($line);
+                                    $parentList->appendChild($line);
                                     $bUpdated=true;
                                 }
                             }
