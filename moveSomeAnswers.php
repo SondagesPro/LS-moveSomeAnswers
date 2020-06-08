@@ -6,7 +6,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2020 Denis Chenu <http://www.sondages.pro>
  * @license GPL
- * @version 1.0.0
+ * @version 1.0.1
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ class moveSomeAnswers extends PluginBase
      */
     protected $settings = array(
         "moveSomeAnswers" => array(
-            "type " => 'string',
+            "type" => 'string',
             'label' => 'This code is moved at end if question have random order (Single choice radio and multiple choice)',
             'default' => 'DNK',
         ),
