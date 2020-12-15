@@ -6,7 +6,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2020 Denis Chenu <http://www.sondages.pro>
  * @license GPL
- * @version 1.0.1
+ * @version 1.0.2
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,6 +54,9 @@ class moveSomeAnswers extends PluginBase
 
     public function newSurveySettings()
     {
+        if (!$this->getEvent()) {
+            throw new CHttpException(403);
+        }
         $event = $this->event;
         foreach ($event->get('settings') as $name => $value) {
             /* In order use survey setting, if not set, use global, if not set use default */
@@ -64,6 +67,9 @@ class moveSomeAnswers extends PluginBase
 
     public function beforeSurveySettings()
     {
+        if (!$this->getEvent()) {
+            throw new CHttpException(403);
+        }
         $oEvent = $this->event;
         $newSettings = array();
         $moveSomeAnswersDefault = $this->get('moveSomeAnswers', null, null, $this->settings['moveSomeAnswers']['default']);
@@ -87,6 +93,9 @@ class moveSomeAnswers extends PluginBase
      */
     public function beforeActivate()
     {
+        if (!$this->getEvent()) {
+            throw new CHttpException(403);
+        }
         $oToolsSmartDomDocument = Plugin::model()->find("name=:name", array(":name" => 'toolsDomDocument'));
         if (!$oToolsSmartDomDocument) {
             $this->getEvent()->set('message', gT("You must download toolsSmartDomDocument plugin"));
@@ -102,6 +111,9 @@ class moveSomeAnswers extends PluginBase
      */
     public function newQuestionAttributes()
     {
+        if (!$this->getEvent()) {
+            throw new CHttpException(403);
+        }
         $event = $this->getEvent();
         $questionAttributes = array(
             'moveSomeAnswers' => array(
@@ -122,6 +134,9 @@ class moveSomeAnswers extends PluginBase
      */
     public function moveSomeAnswersInList()
     {
+        if (!$this->getEvent()) {
+            throw new CHttpException(403);
+        }
         $oEvent = $this->getEvent();
         if (in_array($oEvent->get('type'), array("L","M","P","Q","K"))) {
             $surveySettings = $this->get('moveSomeAnswers', 'Survey', $oEvent->get('surveyId'));
