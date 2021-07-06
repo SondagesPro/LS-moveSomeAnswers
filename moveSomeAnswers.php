@@ -6,7 +6,7 @@
  * @author Denis Chenu <denis@sondages.pro>
  * @copyright 2016-2021 Denis Chenu <http://www.sondages.pro>
  * @license GPL
- * @version 1.1.0
+ * @version 1.1.1
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
