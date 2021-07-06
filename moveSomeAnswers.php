@@ -4,9 +4,9 @@
  * Add an attribute for some question, to always move some answer or sub question at end
  *
  * @author Denis Chenu <denis@sondages.pro>
- * @copyright 2016-2020 Denis Chenu <http://www.sondages.pro>
+ * @copyright 2016-2021 Denis Chenu <http://www.sondages.pro>
  * @license GPL
- * @version 1.0.2
+ * @version 1.1.0
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,9 +47,6 @@ class moveSomeAnswers extends PluginBase
 
         $this->subscribe('beforeSurveySettings');
         $this->subscribe('newSurveySettings');
-
-        /* To add own translation message source */
-        $this->subscribe('afterPluginLoad');
     }
 
     public function newSurveySettings()
@@ -138,104 +135,83 @@ class moveSomeAnswers extends PluginBase
             throw new CHttpException(403);
         }
         $oEvent = $this->getEvent();
-        if (in_array($oEvent->get('type'), array("L","M","P","Q","K"))) {
-            $surveySettings = $this->get('moveSomeAnswers', 'Survey', $oEvent->get('surveyId'));
-            if ($surveySettings == "") {
-                $surveySettings = $this->get('moveSomeAnswers', null, null, $this->settings['moveSomeAnswers']['default']);
-            }
-            $aAttributes = QuestionAttribute::model()->getQuestionAttributes($this->getEvent()->get('qid'));
-            if ($aAttributes["random_order"] || $surveySettings) {
-                /* @todo : must use EM for $aAttributes["orderByAnswers"] */
-                $moveSomeAnswers = trim($aAttributes["moveSomeAnswers"]);
-                if (empty($moveSomeAnswers)) {
-                    $moveSomeAnswers = $surveySettings;
-                }
-                if ($moveSomeAnswers == "") {
-                    $moveSomeAnswers = $this->get('moveSomeAnswers', 'Survey', $oEvent->get('surveyId'));
-                    if ($moveSomeAnswers == "") {
-                        $moveSomeAnswers = $this->get('moveSomeAnswers', null, null, $this->settings['moveSomeAnswers']['default']);
+        if (!in_array($oEvent->get('type'), array("L","M","P","Q","K"))) {
+            return;
+        }
+        $aAttributes = QuestionAttribute::model()->getQuestionAttributes($this->getEvent()->get('qid'));
+        if (empty($aAttributes["random_order"])) {
+            return;
+        }
+        $surveySettings = $this->get('moveSomeAnswers', 'Survey', $oEvent->get('surveyId'));
+        if ($surveySettings == "") {
+            $surveySettings = $this->get('moveSomeAnswers', null, null, $this->settings['moveSomeAnswers']['default']);
+        }
+        $moveSomeAnswers = trim($aAttributes["moveSomeAnswers"]);
+        if (empty($moveSomeAnswers)) {
+            $moveSomeAnswers = $surveySettings;
+        }
+        if ($moveSomeAnswers === "" || $moveSomeAnswers === ".") {
+            return;
+        }
+        /* We move it (if exist) */
+        $aAtEnd = explode(",", $moveSomeAnswers);
+        $dom = new \toolsDomDocument\SmartDOMDocument();
+        $dom->loadPartialHTML($oEvent->get('answers'));
+        $bUpdated = false;
+        switch ($oEvent->get('type')) {
+            case "L":
+            case "Q":
+            case "K":
+                $lineBaseId = "javatbd{$oEvent->get('surveyId')}X{$oEvent->get('gid')}X{$oEvent->get('qid')}";
+                foreach ($aAtEnd as $sAtEnd) {
+                    // @todo : Control LS version
+                    $line = $dom->getElementById($lineBaseId . $sAtEnd);
+                    if ($line) {
+                        $parentList = $line->parentNode;
+                        $parentList->removeChild($line);
+                        $parentList->appendChild($line);
+                        $bUpdated = true;
                     }
                 }
-                if ($moveSomeAnswers !== "" && $moveSomeAnswers !== ".") {
-                    $aAtEnd = explode(",", $moveSomeAnswers);
-                    $dom = new \toolsDomDocument\SmartDOMDocument();
-                    $dom->loadPartialHTML($this->event->get('answers'));
-                    $bUpdated = false;
-                    switch ($oEvent->get('type')) {
-                        case "L":
-                        case "Q":
-                        case "K":
-                            $lineBaseId = "javatbd{$oEvent->get('surveyId')}X{$oEvent->get('gid')}X{$oEvent->get('qid')}";
-                            foreach ($aAtEnd as $sAtEnd) {
-                                // @todo : Control LS version
-                                $line = $dom->getElementById($lineBaseId . $sAtEnd);
-                                if ($line) {
-                                    $parentList = $line->parentNode;
-                                    $parentList->removeChild($line);
-                                    $parentList->appendChild($line);
-                                    $bUpdated = true;
-                                }
-                            }
-                            /* Optionaly move no answer to end : wait for clearing HTML code */
-                            break;
-                        case "M":
-                        case "P":
-                            $lineBaseId = "javatbd{$oEvent->get('surveyId')}X{$oEvent->get('gid')}X{$oEvent->get('qid')}";
-                            foreach ($aAtEnd as $sAtEnd) {
-                                $line = $dom->getElementById($lineBaseId . $sAtEnd);
-                                if ($line) {
-                                    $parentList = $line->parentNode;
-                                    $parentList->removeChild($line);
-                                    $parentList->appendChild($line);
-                                    $bUpdated = true;
-                                }
-                            }
-                            // no break
-                        default:
-                            break;
+                /* Optionaly move no answer to end : wait for clearing HTML code */
+                break;
+            case "M":
+            case "P":
+                $lineBaseId = "javatbd{$oEvent->get('surveyId')}X{$oEvent->get('gid')}X{$oEvent->get('qid')}";
+                foreach ($aAtEnd as $sAtEnd) {
+                    $line = $dom->getElementById($lineBaseId . $sAtEnd);
+                    if ($line) {
+                        $parentList = $line->parentNode;
+                        $parentList->removeChild($line);
+                        $parentList->appendChild($line);
+                        $bUpdated = true;
                     }
-                    if ($bUpdated) {
-                        /* For multiple numeric : must move some part at end */
-                        if ($oEvent->get('type') == "K" && $parentList) {
-                            $childToMove = array();
-                            foreach ($parentList->getElementsByTagName('tr') as $child) {
-                                if (!$child->hasAttribute('id')) {
-                                    $childToMove[] = $child;
-                                }
-                            }
-                            foreach ($childToMove as $child) {
-                                $parentList->removeChild($child);
-                                $parentList->appendChild($child);
-                            }
-                        }
-                        $newHtml = $dom->saveHTMLExact();
-                        $oEvent->set('answers', $newHtml);
+                }
+                // no break
+            default:
+                break;
+        }
+        if ($bUpdated) {
+            /* For multiple numeric : must move some part at end */
+            if ($oEvent->get('type') == "K" && $parentList) {
+                $childToMove = array();
+                foreach ($parentList->getElementsByTagName('tr') as $child) {
+                    if (!$child->hasAttribute('id')) {
+                        $childToMove[] = $child;
                     }
+                }
+                foreach ($childToMove as $child) {
+                    $parentList->removeChild($child);
+                    $parentList->appendChild($child);
                 }
             }
+            $newHtml = $dom->saveHTMLExact();
+            $oEvent->set('answers', $newHtml);
         }
     }
 
     private function translate($string)
     {
-        return Yii::t('', $string, array(), get_class($this));
-    }
-    /**
-     * Add this translation just after loaded all plugins
-     * @see event afterPluginLoad
-     */
-    public function afterPluginLoad()
-    {
-        // messageSource for this plugin:
-        $messageMaintenanceMode = array(
-            'class' => 'CGettextMessageSource',
-            'cacheID' => get_class($this) . 'Lang',
-            'cachingDuration' => 3600,
-            'forceTranslation' => true,
-            'useMoFile' => true,
-            'basePath' => __DIR__ . DIRECTORY_SEPARATOR . 'locale',
-            'catalog' => 'messages',// default from Yii
-        );
-        Yii::app()->setComponent(get_class($this), $messageMaintenanceMode);
+        return Yii::t('', $string, array(), get_class($this) . 'Messages');
     }
 }
