@@ -4,10 +4,10 @@
         <name>moveSomeAnswers</name>
         <type>plugin</type>
         <creationDate>2020-06-06</creationDate>
-        <lastUpdate>2021-07-06</lastUpdate>
+        <lastUpdate>2024-09-13</lastUpdate>
         <author>Denis Chenu</author>
         <authorUrl>https://sondages.pro</authorUrl>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
         <license>GPL</license>
         <description><![CDATA[Allow to move some answers directly at end if random is set.]]></description>
     </metadata>
@@ -15,5 +15,6 @@
         <version>3</version>
         <version>4</version>
         <version>5</version>
+        <version>6</version>
     </compatibility>
 </config>

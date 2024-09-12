@@ -139,7 +139,7 @@ class moveSomeAnswers extends PluginBase
             return;
         }
         $aAttributes = QuestionAttribute::model()->getQuestionAttributes($this->getEvent()->get('qid'));
-        if (empty($aAttributes["random_order"])) {
+        if (empty($aAttributes["random_order"]) && (empty($aAttributes["answer_order"]) || $aAttributes["answer_order"] != 'random')) {
             return;
         }
         $surveySettings = $this->get('moveSomeAnswers', 'Survey', $oEvent->get('surveyId'));
